@@ -1,11 +1,222 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>页面标题</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简易留言板 - XSS漏洞演示</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f0f7ff;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 25px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 15px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        input:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .messages {
+            margin-top: 30px;
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+        }
+        .message {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+        .message h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 8px;
+        }
+        .explanation {
+            background-color: #e8f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            border: 1px solid #3498db;
+        }
+        .explanation h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .explanation ul {
+            padding-left: 20px;
+        }
+        .explanation li {
+            margin-bottom: 10px;
+        }
+        .danger {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .safe {
+            color: #27ae60;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <!-- src 属性填图片文件名，alt 为图片加载失败时的替代文本 -->
-    <img src="yexuanche.jpg" alt="yexuanche 图片">
+    <div class="container">
+        <h1>简易留言板</h1>
+        
+        <div class="warning">
+            ⚠️ 注意：此页面包含<strong>XSS安全漏洞</strong>，仅供学习演示使用！
+        </div>
+        
+        <div class="form-group">
+            <label for="name">你的名字：</label>
+            <input type="text" id="name" placeholder="输入你的名字">
+        </div>
+        
+        <div class="form-group">
+            <label for="message">留言内容：</label>
+            <textarea id="message" rows="4" placeholder="输入你的留言..."></textarea>
+        </div>
+        
+        <button onclick="addMessage()">发布留言</button>
+        
+        <div class="messages">
+            <h2>留言列表</h2>
+            <div id="messageList"></div>
+        </div>
+        
+        <div class="explanation">
+            <h2>XSS漏洞说明</h2>
+            <p>这个留言板存在<strong class="danger">存储型XSS漏洞</strong>，因为：</p>
+            <ul>
+                <li>用户输入的内容<strong>没有经过安全检查</strong></li>
+                <li>留言内容被<strong>直接作为HTML代码</strong>插入到页面中</li>
+                <li>攻击者可以在留言中<strong>插入JavaScript代码</strong></li>
+            </ul>
+            
+            <p>🛡️ <strong>如何修复漏洞：</strong></p>
+            <ul>
+                <li>对用户输入进行<strong class="safe">过滤</strong>（移除&lt;script&gt;标签）</li>
+                <li>对输出内容进行<strong class="safe">转义</strong>（将 &lt; 变成 &amp;lt;）</li>
+                <li>使用安全的API插入内容（如textContent代替innerHTML）</li>
+            </ul>
+            
+            <p>💡 <strong>尝试XSS攻击：</strong></p>
+            <p>在留言框中输入以下内容：</p>
+            <pre>&lt;script&gt;alert('XSS攻击成功！');&lt;/script&gt;</pre>
+            <p>或尝试：</p>
+            <pre>&lt;img src="x" onerror="alert('你的留言板被攻击了！')"&gt;</pre>
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据库存储
+        let messages = [
+            { name: "小明", message: "这个留言板真不错！" },
+            { name: "小红", message: "大家要注意网络安全！" }
+        ];
+        
+        // 显示所有留言
+        function displayMessages() {
+            const messageList = document.getElementById('messageList');
+            messageList.innerHTML = '';
+            
+            messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message';
+                
+                // 漏洞点：直接使用innerHTML插入未处理的内容
+                messageDiv.innerHTML = `
+                    <h3>${msg.name}</h3>
+                    <div>${msg.message}</div>
+                `;
+                
+                messageList.appendChild(messageDiv);
+            });
+        }
+        
+        // 添加新留言
+        function addMessage() {
+            const nameInput = document.getElementById('name');
+            const messageInput = document.getElementById('message');
+            
+            const name = nameInput.value.trim();
+            const message = messageInput.value.trim();
+            
+            if (name && message) {
+                // 将新留言添加到数组中
+                messages.push({ name, message });
+                
+                // 清空输入框
+                nameInput.value = '';
+                messageInput.value = '';
+                
+                // 重新显示留言
+                displayMessages();
+            } else {
+                alert('请填写名字和留言内容！');
+            }
+        }
+        
+        // 初始显示留言
+        displayMessages();
+    </script>
 </body>
 </html>
