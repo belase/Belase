@@ -1,222 +1,169 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>简易留言板 - XSS漏洞演示</title>
+    <title>张斌 & 黄思雅 - 双爱心排列弹窗（动画版）</title>
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        /* 页面基础样式优化：渐变背景+更细腻的排版 */
         body {
-            background-color: #f0f7ff;
             margin: 0;
-            padding: 20px;
-            color: #333;
+            padding: 0;
+            height: 100vh;
+            /* 渐变背景调整为偏暖色系，适配爱心主题 */
+            background: linear-gradient(135deg, #fef7fb 0%, #fdf2f8 50%, #fcf1f7 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
+            overflow: hidden; /* 防止页面滚动 */
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            padding: 25px;
+
+        /* 弹窗容器优化（适配双爱心尺寸） */
+        .popup-container {
+            position: relative;
+            width: 1100px; /* 加宽容器容纳双爱心 */
+            height: 700px;
+            /* 容器添加轻微阴影，增加层次感 */
+            filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.05));
         }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-top: 0;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 15px;
-        }
-        .warning {
-            background-color: #fff3cd;
-            border-left: 5px solid #ffc107;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border 0.3s;
-        }
-        input:focus, textarea:focus {
-            border-color: #3498db;
-            outline: none;
-        }
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
+
+        /* 弹窗样式升级：更精致的视觉效果 */
+        .popup {
+            position: absolute;
+            width: 70px; 
+            height: 70px;
+            /* 渐变背景+细边框，提升质感 */
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 1px solid #e6e9ec;
+            border-radius: 12px; /* 更大圆角，更柔和 */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748; /* 更舒适的文字颜色 */
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            /* 初始状态：隐藏+缩放为0 */
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0);
+            /* 动画时长+缓动函数，保证弹动流畅 */
+            transition: all 0.1s ease;
+            /* 自定义hover渐变变量（默认值） */
+            --hover-gradient: linear-gradient(135deg, #fdf2f8 0%, #fef7fb 100%);
         }
-        button:hover {
-            background-color: #2980b9;
+
+        /* 弹动动画关键帧：模拟弹性回弹效果 */
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0);
+            }
+            60% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1); /* 稍微放大过冲 */
+            }
+            80% {
+                transform: translate(-50%, -50%) scale(0.95); /* 轻微回缩 */
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1); /* 最终稳定 */
+            }
         }
-        .messages {
-            margin-top: 30px;
-            border-top: 2px solid #eee;
-            padding-top: 20px;
+
+        /* 弹窗hover效果升级：使用自定义渐变变量 */
+        .popup:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            background: var(--hover-gradient); /* 动态渐变背景 */
+            color: #4a5568;
+            transform: translate(-50%, -50%) scale(1.08);
         }
-        .message {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border-left: 4px solid #3498db;
-        }
-        .message h3 {
-            margin-top: 0;
-            color: #2c3e50;
-            border-bottom: 1px dashed #ddd;
-            padding-bottom: 8px;
-        }
-        .explanation {
-            background-color: #e8f4f8;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 30px;
-            border: 1px solid #3498db;
-        }
-        .explanation h2 {
-            color: #2c3e50;
-            margin-top: 0;
-        }
-        .explanation ul {
-            padding-left: 20px;
-        }
-        .explanation li {
-            margin-bottom: 10px;
-        }
-        .danger {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        .safe {
-            color: #27ae60;
-            font-weight: bold;
+
+        /* 激活弹动动画的类 */
+        .popup.show {
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>简易留言板</h1>
-        
-        <div class="warning">
-            ⚠️ 注意：此页面包含<strong>XSS安全漏洞</strong>，仅供学习演示使用！
-        </div>
-        
-        <div class="form-group">
-            <label for="name">你的名字：</label>
-            <input type="text" id="name" placeholder="输入你的名字">
-        </div>
-        
-        <div class="form-group">
-            <label for="message">留言内容：</label>
-            <textarea id="message" rows="4" placeholder="输入你的留言..."></textarea>
-        </div>
-        
-        <button onclick="addMessage()">发布留言</button>
-        
-        <div class="messages">
-            <h2>留言列表</h2>
-            <div id="messageList"></div>
-        </div>
-        
-        <div class="explanation">
-            <h2>XSS漏洞说明</h2>
-            <p>这个留言板存在<strong class="danger">存储型XSS漏洞</strong>，因为：</p>
-            <ul>
-                <li>用户输入的内容<strong>没有经过安全检查</strong></li>
-                <li>留言内容被<strong>直接作为HTML代码</strong>插入到页面中</li>
-                <li>攻击者可以在留言中<strong>插入JavaScript代码</strong></li>
-            </ul>
-            
-            <p>🛡️ <strong>如何修复漏洞：</strong></p>
-            <ul>
-                <li>对用户输入进行<strong class="safe">过滤</strong>（移除&lt;script&gt;标签）</li>
-                <li>对输出内容进行<strong class="safe">转义</strong>（将 &lt; 变成 &amp;lt;）</li>
-                <li>使用安全的API插入内容（如textContent代替innerHTML）</li>
-            </ul>
-            
-            <p>💡 <strong>尝试XSS攻击：</strong></p>
-            <p>在留言框中输入以下内容：</p>
-            <pre>&lt;script&gt;alert('XSS攻击成功！');&lt;/script&gt;</pre>
-            <p>或尝试：</p>
-            <pre>&lt;img src="x" onerror="alert('你的留言板被攻击了！')"&gt;</pre>
-        </div>
-    </div>
+    <div class="popup-container" id="popupContainer"></div>
 
     <script>
-        // 模拟数据库存储
-        let messages = [
-            { name: "小明", message: "这个留言板真不错！" },
-            { name: "小红", message: "大家要注意网络安全！" }
-        ];
-        
-        // 显示所有留言
-        function displayMessages() {
-            const messageList = document.getElementById('messageList');
-            messageList.innerHTML = '';
-            
-            messages.forEach(msg => {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'message';
+        // 全局配置参数（统一管理双爱心）
+        const globalConfig = {
+            popupCount: 50, // 每个爱心的弹窗数量
+            scale: 12, // 爱心整体缩放比例
+            offsetY: 20, // 爱心垂直偏移（居中用）
+            delayStep: 0.2, // 单个弹窗弹出间隔
+            heartOffsetX: 250, // 右侧爱心相对左侧的水平偏移量
+            gradientThemes: [ // 共享的hover渐变配色
+                'linear-gradient(135deg, #fdf2f8 0%, #fef7fb 100%)', // 浅粉
+                'linear-gradient(135deg, #e8f4f8 0%, #f0f8fb 100%)', // 浅蓝
+                'linear-gradient(135deg, #f7f3e9 0%, #faf6ed 100%)', // 浅米
+                'linear-gradient(135deg, #eaf6fa 0%, #f5fafe 100%)', // 浅青
+                'linear-gradient(135deg, #fcf1f7 0%, #faf0f5 100%)', // 蜜桃粉
+                'linear-gradient(135deg, #f8f8f8 0%, #fafafa 100%)', // 极浅灰
+                'linear-gradient(135deg, #e6f7fb 0%, #f0f8fb 100%)', // 浅蓝绿
+                'linear-gradient(135deg, #f5f0f6 0%, #f9f4f8 100%)'  // 藕粉
+            ]
+        };
+
+        // 获取弹窗容器
+        const container = document.getElementById("popupContainer");
+        // 容器中心坐标（基准点）
+        const baseCenterX = container.offsetWidth / 2 - globalConfig.heartOffsetX / 2;
+        const centerY = container.offsetHeight / 2;
+
+        /**
+         * 封装创建爱心弹窗的复用函数
+         * @param {string} content 弹窗显示内容
+         * @param {number} xOffset 爱心水平偏移量
+         * @param {number} startDelay 爱心开始弹出的延迟（秒）
+         */
+        function createHeartPopup(content, xOffset, startDelay) {
+            for (let i = 0; i < globalConfig.popupCount; i++) {
+                // 1. 计算爱心参数（t从0到2π，平均分配）
+                const t = (i / globalConfig.popupCount) * 2 * Math.PI;
+                // 2. 经典爱心参数方程
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
                 
-                // 漏洞点：直接使用innerHTML插入未处理的内容
-                messageDiv.innerHTML = `
-                    <h3>${msg.name}</h3>
-                    <div>${msg.message}</div>
-                `;
+                // 3. 缩放+偏移+居中计算最终坐标
+                const finalX = baseCenterX + xOffset + x * globalConfig.scale;
+                const finalY = centerY + y * globalConfig.scale + globalConfig.offsetY;
+
+                // 4. 创建弹窗元素
+                const popup = document.createElement("div");
+                popup.className = "popup";
+                popup.innerHTML = content;
+                popup.style.left = `${finalX}px`;
+                popup.style.top = `${finalY}px`;
+                // 5. 计算总延迟：起始延迟 + 单个弹窗间隔
+                const totalDelay = startDelay + i * globalConfig.delayStep;
+                popup.style.animationDelay = `${totalDelay}s`;
                 
-                messageList.appendChild(messageDiv);
-            });
-        }
-        
-        // 添加新留言
-        function addMessage() {
-            const nameInput = document.getElementById('name');
-            const messageInput = document.getElementById('message');
-            
-            const name = nameInput.value.trim();
-            const message = messageInput.value.trim();
-            
-            if (name && message) {
-                // 将新留言添加到数组中
-                messages.push({ name, message });
-                
-                // 清空输入框
-                nameInput.value = '';
-                messageInput.value = '';
-                
-                // 重新显示留言
-                displayMessages();
-            } else {
-                alert('请填写名字和留言内容！');
+                // 6. 分配hover渐变（循环使用配色）
+                const gradientIndex = i % globalConfig.gradientThemes.length;
+                popup.style.setProperty('--hover-gradient', globalConfig.gradientThemes[gradientIndex]);
+
+                // 7. 添加到容器
+                container.appendChild(popup);
+
+                // 8. 触发动画
+                setTimeout(() => {
+                    popup.classList.add("show");
+                }, 10);
             }
         }
-        
-        // 初始显示留言
-        displayMessages();
+
+        // 1. 先创建左侧"张斌"爱心（无偏移，立即开始）
+        createHeartPopup("张斌", 0, 0);
+        // 2. 计算张斌爱心总时长，黄思雅在其完成后开始（50*0.2=10秒延迟）
+        const zhangBinTotalTime = globalConfig.popupCount * globalConfig.delayStep;
+        // 3. 创建右侧"黄思雅"爱心（向右偏移250px，延迟10秒开始）
+        createHeartPopup("黄思雅", globalConfig.heartOffsetX, zhangBinTotalTime);
     </script>
 </body>
 </html>
