@@ -1,169 +1,361 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>张斌 & 黄思雅 - 双爱心排列弹窗（动画版）</title>
-    <style>
-        /* 页面基础样式优化：渐变背景+更细腻的排版 */
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            /* 渐变背景调整为偏暖色系，适配爱心主题 */
-            background: linear-gradient(135deg, #fef7fb 0%, #fdf2f8 50%, #fcf1f7 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
-            overflow: hidden; /* 防止页面滚动 */
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>叶炫牌汽车 - 驾驭非凡 · 尽享奢华</title>
+  <!-- 引入图标库 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      scroll-behavior: smooth;
+    }
 
-        /* 弹窗容器优化（适配双爱心尺寸） */
-        .popup-container {
-            position: relative;
-            width: 1100px; /* 加宽容器容纳双爱心 */
-            height: 700px;
-            /* 容器添加轻微阴影，增加层次感 */
-            filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.05));
-        }
+    /* 全局变量 */
+    :root {
+      --primary: #0F172A;
+      --accent: #2563EB;
+      --light: #F8FAFC;
+      --gray: #64748B;
+      --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
-        /* 弹窗样式升级：更精致的视觉效果 */
-        .popup {
-            position: absolute;
-            width: 70px; 
-            height: 70px;
-            /* 渐变背景+细边框，提升质感 */
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border: 1px solid #e6e9ec;
-            border-radius: 12px; /* 更大圆角，更柔和 */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            font-weight: 600;
-            color: #2d3748; /* 更舒适的文字颜色 */
-            cursor: pointer;
-            /* 初始状态：隐藏+缩放为0 */
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0);
-            /* 动画时长+缓动函数，保证弹动流畅 */
-            transition: all 0.1s ease;
-            /* 自定义hover渐变变量（默认值） */
-            --hover-gradient: linear-gradient(135deg, #fdf2f8 0%, #fef7fb 100%);
-        }
+    body {
+      background: var(--light);
+      color: var(--primary);
+      overflow-x: hidden;
+    }
 
-        /* 弹动动画关键帧：模拟弹性回弹效果 */
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0);
-            }
-            60% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1.1); /* 稍微放大过冲 */
-            }
-            80% {
-                transform: translate(-50%, -50%) scale(0.95); /* 轻微回缩 */
-            }
-            100% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1); /* 最终稳定 */
-            }
-        }
+    /* 导航栏 */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 18px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 999;
+      transition: var(--transition);
+    }
 
-        /* 弹窗hover效果升级：使用自定义渐变变量 */
-        .popup:hover {
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            background: var(--hover-gradient); /* 动态渐变背景 */
-            color: #4a5568;
-            transform: translate(-50%, -50%) scale(1.08);
-        }
+    .logo {
+      font-size: 26px;
+      font-weight: 700;
+      color: white;
+      letter-spacing: 1px;
+    }
 
-        /* 激活弹动动画的类 */
-        .popup.show {
-            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-    </style>
+    .logo span {
+      color: #38BDF8;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      margin-left: 32px;
+      font-size: 15px;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover {
+      color: #38BDF8;
+      transform: translateY(-2px);
+    }
+
+    /* Banner 区域 */
+    .banner {
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('/pic/p1.jpg');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      padding: 0 20px;
+      animation: fadeIn 1.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .banner h1 {
+      font-size: 58px;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+
+    .banner p {
+      font-size: 20px;
+      max-width: 700px;
+      margin-bottom: 40px;
+      opacity: 0.9;
+    }
+
+    .btn {
+      padding: 14px 36px;
+      background: #2563EB;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: #1D4ED8;
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(37,99,235,0.3);
+    }
+
+    /* 通用区块 */
+    .section {
+      padding: 100px 6%;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 38px;
+      margin-bottom: 60px;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      width: 70px;
+      height: 4px;
+      background: var(--accent);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: -14px;
+      border-radius: 4px;
+    }
+
+    /* 车型展示 */
+    .cars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 36px;
+    }
+
+    .car-card {
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      transition: var(--transition);
+    }
+
+    .car-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.12);
+    }
+
+    .car-img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      transition: 0.5s;
+    }
+
+    .car-card:hover .car-img {
+      transform: scale(1.08);
+    }
+
+    .car-info {
+      padding: 24px;
+    }
+
+    .car-info h3 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .car-info p {
+      color: var(--gray);
+      margin-bottom: 16px;
+    }
+
+    /* 视频区域 */
+    .video-section {
+      background: #111827;
+      color: white;
+      text-align: center;
+      padding: 120px 6%;
+    }
+
+    .video-box {
+      max-width: 900px;
+      margin: 0 auto;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    video {
+      width: 100%;
+      display: block;
+    }
+
+    /* 亮点特性 */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+    }
+
+    .feature {
+      text-align: center;
+      padding: 30px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: var(--transition);
+    }
+
+    .feature:hover {
+      transform: translateY(-6px);
+    }
+
+    .feature i {
+      font-size: 40px;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .feature h3 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    /* 底部 */
+    footer {
+      background: var(--primary);
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    /* 响应式 */
+    @media (max-width:768px) {
+      .banner h1 {
+        font-size: 36px;
+      }
+      .nav-links a {
+        margin-left: 16px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="popup-container" id="popupContainer"></div>
 
-    <script>
-        // 全局配置参数（统一管理双爱心）
-        const globalConfig = {
-            popupCount: 50, // 每个爱心的弹窗数量
-            scale: 12, // 爱心整体缩放比例
-            offsetY: 20, // 爱心垂直偏移（居中用）
-            delayStep: 0.2, // 单个弹窗弹出间隔
-            heartOffsetX: 250, // 右侧爱心相对左侧的水平偏移量
-            gradientThemes: [ // 共享的hover渐变配色
-                'linear-gradient(135deg, #fdf2f8 0%, #fef7fb 100%)', // 浅粉
-                'linear-gradient(135deg, #e8f4f8 0%, #f0f8fb 100%)', // 浅蓝
-                'linear-gradient(135deg, #f7f3e9 0%, #faf6ed 100%)', // 浅米
-                'linear-gradient(135deg, #eaf6fa 0%, #f5fafe 100%)', // 浅青
-                'linear-gradient(135deg, #fcf1f7 0%, #faf0f5 100%)', // 蜜桃粉
-                'linear-gradient(135deg, #f8f8f8 0%, #fafafa 100%)', // 极浅灰
-                'linear-gradient(135deg, #e6f7fb 0%, #f0f8fb 100%)', // 浅蓝绿
-                'linear-gradient(135deg, #f5f0f6 0%, #f9f4f8 100%)'  // 藕粉
-            ]
-        };
+<!-- 导航栏 -->
+<nav>
+  <div class="logo">叶炫<span>汽车</span></div>
+  <div class="nav-links">
+    <a href="#home">首页</a>
+    <a href="#models">车型</a>
+    <a href="#video">体验</a>
+    <a href="#feature">亮点</a>
+    <a href="#contact">联系</a>
+  </div>
+</nav>
 
-        // 获取弹窗容器
-        const container = document.getElementById("popupContainer");
-        // 容器中心坐标（基准点）
-        const baseCenterX = container.offsetWidth / 2 - globalConfig.heartOffsetX / 2;
-        const centerY = container.offsetHeight / 2;
+<!-- Banner -->
+<section class="banner" id="home">
+  <h1>叶炫牌汽车 · 引领未来出行</h1>
+  <p>匠心工艺 · 极致性能 · 奢华体验 · 安全可靠</p>
+  <a href="#models" class="btn">查看全系车型</a>
+</section>
 
-        /**
-         * 封装创建爱心弹窗的复用函数
-         * @param {string} content 弹窗显示内容
-         * @param {number} xOffset 爱心水平偏移量
-         * @param {number} startDelay 爱心开始弹出的延迟（秒）
-         */
-        function createHeartPopup(content, xOffset, startDelay) {
-            for (let i = 0; i < globalConfig.popupCount; i++) {
-                // 1. 计算爱心参数（t从0到2π，平均分配）
-                const t = (i / globalConfig.popupCount) * 2 * Math.PI;
-                // 2. 经典爱心参数方程
-                const x = 16 * Math.pow(Math.sin(t), 3);
-                const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
-                
-                // 3. 缩放+偏移+居中计算最终坐标
-                const finalX = baseCenterX + xOffset + x * globalConfig.scale;
-                const finalY = centerY + y * globalConfig.scale + globalConfig.offsetY;
+<!-- 车型展示 -->
+<section class="section" id="models">
+  <h2 class="section-title">全系车型</h2>
+  <div class="cars-grid">
+    <div class="car-card">
+      <img src="/pic/p1.jpg" class="car-img" alt="叶炫轿车">
+      <div class="car-info">
+        <h3>叶炫 · 豪华轿车</h3>
+        <p>智能座舱 + 强劲动力，商务与舒适的完美结合</p>
+        <a href="#" class="btn">了解详情</a>
+      </div>
+    </div>
+    <div class="car-card">
+      <img src="/pic/p2.jpg" class="car-img" alt="叶炫SUV">
+      <div class="car-info">
+        <h3>叶炫 · 旗舰SUV</h3>
+        <p>全地形通过能力，超大空间，家庭出行首选</p>
+        <a href="#" class="btn">了解详情</a>
+      </div>
+    </div>
+    <div class="car-card">
+      <img src="/pic/p3.jpg" class="car-img" alt="叶炫超跑">
+      <div class="car-info">
+        <h3>叶炫 · 性能超跑</h3>
+        <p>零百加速3.8秒，风阻设计，极致驾驶乐趣</p>
+        <a href="#" class="btn">了解详情</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-                // 4. 创建弹窗元素
-                const popup = document.createElement("div");
-                popup.className = "popup";
-                popup.innerHTML = content;
-                popup.style.left = `${finalX}px`;
-                popup.style.top = `${finalY}px`;
-                // 5. 计算总延迟：起始延迟 + 单个弹窗间隔
-                const totalDelay = startDelay + i * globalConfig.delayStep;
-                popup.style.animationDelay = `${totalDelay}s`;
-                
-                // 6. 分配hover渐变（循环使用配色）
-                const gradientIndex = i % globalConfig.gradientThemes.length;
-                popup.style.setProperty('--hover-gradient', globalConfig.gradientThemes[gradientIndex]);
+<!-- 视频宣传 -->
+<section class="video-section" id="video">
+  <h2 class="section-title">官方宣传视频</h2>
+  <div class="video-box">
+    <video src="/data/ree.mp4" controls poster="/pic/p4.jpg" preload="none"></video>
+  </div>
+</section>
 
-                // 7. 添加到容器
-                container.appendChild(popup);
+<!-- 核心亮点 -->
+<section class="section" id="feature">
+  <h2 class="section-title">核心亮点</h2>
+  <div class="features">
+    <div class="feature">
+      <i class="fas fa-bolt"></i>
+      <h3>超强动力</h3>
+      <p>新一代混动/电动系统，动力随叫随到，能耗更低</p>
+    </div>
+    <div class="feature">
+      <i class="fas fa-shield-halved"></i>
+      <h3>顶级安全</h3>
+      <p>全车身刚性加固，智能辅助驾驶，全方位守护</p>
+    </div>
+    <div class="feature">
+      <i class="fas fa-couch"></i>
+      <h3>奢华内饰</h3>
+      <p>高端材质包裹，人体工学座椅，静谧驾乘空间</p>
+    </div>
+    <div class="feature">
+      <i class="fas fa-microchip"></i>
+      <h3>智能科技</h3>
+      <p>车联网系统，语音控制，自动泊车，未来已来</p>
+    </div>
+  </div>
+</section>
 
-                // 8. 触发动画
-                setTimeout(() => {
-                    popup.classList.add("show");
-                }, 10);
-            }
-        }
+<!-- 底部 -->
+<footer id="contact">
+  <p>叶炫牌汽车 © 2025 版权所有 | 匠心制造 · 品质之选</p>
+  <p>全国服务热线：400-888-XXXX</p>
+</footer>
 
-        // 1. 先创建左侧"张斌"爱心（无偏移，立即开始）
-        createHeartPopup("张斌", 0, 0);
-        // 2. 计算张斌爱心总时长，黄思雅在其完成后开始（50*0.2=10秒延迟）
-        const zhangBinTotalTime = globalConfig.popupCount * globalConfig.delayStep;
-        // 3. 创建右侧"黄思雅"爱心（向右偏移250px，延迟10秒开始）
-        createHeartPopup("黄思雅", globalConfig.heartOffsetX, zhangBinTotalTime);
-    </script>
 </body>
 </html>
