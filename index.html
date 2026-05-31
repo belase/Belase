@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>叶炫牌汽车 - 驾驭非凡 · 尽享奢华</title>
-  <!-- 引入图标库 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
@@ -15,7 +14,6 @@
       scroll-behavior: smooth;
     }
 
-    /* 全局变量 */
     :root {
       --primary: #0F172A;
       --accent: #2563EB;
@@ -30,7 +28,6 @@
       overflow-x: hidden;
     }
 
-    /* 导航栏 */
     nav {
       position: fixed;
       top: 0;
@@ -70,11 +67,10 @@
       transform: translateY(-2px);
     }
 
-    /* Banner 区域 */
     .banner {
       width: 100%;
       height: 100vh;
-      background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('/pic/p1.jpg');
+      background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('pic/p1.jpg');
       background-size: cover;
       background-position: center;
       display: flex;
@@ -124,7 +120,6 @@
       box-shadow: 0 10px 25px rgba(37,99,235,0.3);
     }
 
-    /* 通用区块 */
     .section {
       padding: 100px 6%;
     }
@@ -148,7 +143,6 @@
       border-radius: 4px;
     }
 
-    /* 车型展示 */
     .cars-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -193,7 +187,6 @@
       margin-bottom: 16px;
     }
 
-    /* 视频区域 */
     .video-section {
       background: #111827;
       color: white;
@@ -214,7 +207,6 @@
       display: block;
     }
 
-    /* 亮点特性 */
     .features {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -245,7 +237,6 @@
       margin-bottom: 12px;
     }
 
-    /* 底部 */
     footer {
       background: var(--primary);
       color: white;
@@ -253,7 +244,6 @@
       padding: 40px 20px;
     }
 
-    /* 响应式 */
     @media (max-width:768px) {
       .banner h1 {
         font-size: 36px;
@@ -266,7 +256,6 @@
 </head>
 <body>
 
-<!-- 导航栏 -->
 <nav>
   <div class="logo">叶炫<span>汽车</span></div>
   <div class="nav-links">
@@ -278,19 +267,17 @@
   </div>
 </nav>
 
-<!-- Banner -->
 <section class="banner" id="home">
   <h1>叶炫牌汽车 · 引领未来出行</h1>
   <p>匠心工艺 · 极致性能 · 奢华体验 · 安全可靠</p>
   <a href="#models" class="btn">查看全系车型</a>
 </section>
 
-<!-- 车型展示 -->
 <section class="section" id="models">
   <h2 class="section-title">全系车型</h2>
   <div class="cars-grid">
     <div class="car-card">
-      <img src="/pic/p1.jpg" class="car-img" alt="叶炫轿车">
+      <img src="pic/p1.jpg" class="car-img" alt="叶炫轿车">
       <div class="car-info">
         <h3>叶炫 · 豪华轿车</h3>
         <p>智能座舱 + 强劲动力，商务与舒适的完美结合</p>
@@ -298,7 +285,7 @@
       </div>
     </div>
     <div class="car-card">
-      <img src="/pic/p2.jpg" class="car-img" alt="叶炫SUV">
+      <img src="pic/p2.jpg" class="car-img" alt="叶炫SUV">
       <div class="car-info">
         <h3>叶炫 · 旗舰SUV</h3>
         <p>全地形通过能力，超大空间，家庭出行首选</p>
@@ -306,7 +293,7 @@
       </div>
     </div>
     <div class="car-card">
-      <img src="/pic/p3.jpg" class="car-img" alt="叶炫超跑">
+      <img src="pic/p3.jpg" class="car-img" alt="叶炫超跑">
       <div class="car-info">
         <h3>叶炫 · 性能超跑</h3>
         <p>零百加速3.8秒，风阻设计，极致驾驶乐趣</p>
@@ -316,15 +303,13 @@
   </div>
 </section>
 
-<!-- 视频宣传 -->
 <section class="video-section" id="video">
   <h2 class="section-title">官方宣传视频</h2>
   <div class="video-box">
-    <video src="/data/ree.mp4" controls poster="/pic/p4.jpg" preload="none"></video>
+    <video src="data/ree.mp4" controls poster="pic/p4.jpg" muted playsinline preload="auto"></video>
   </div>
 </section>
 
-<!-- 核心亮点 -->
 <section class="section" id="feature">
   <h2 class="section-title">核心亮点</h2>
   <div class="features">
@@ -351,7 +336,6 @@
   </div>
 </section>
 
-<!-- 底部 -->
 <footer id="contact">
   <p>叶炫牌汽车 © 2025 版权所有 | 匠心制造 · 品质之选</p>
   <p>全国服务热线：400-888-XXXX</p>
